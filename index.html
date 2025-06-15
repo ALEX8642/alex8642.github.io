@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Nothing to see here...</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 2em;
+        }
+
+        .quote-box {
+            background-color: #1e1e1e;
+            border-left: 4px solid #00bcd4;
+            padding: 1.5em;
+            margin: 1em 0;
+            max-width: 600px;
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        .fun-box {
+            background-color: #252525;
+            border-left: 4px dashed #ff9800;
+            color: #ffc107;
+        }
+
+        .quote {
+            font-size: 1.2em;
+            line-height: 1.5;
+        }
+
+        .author {
+            text-align: right;
+            margin-top: 1em;
+            font-style: italic;
+            font-size: 0.95em;
+            color: #aaa;
+        }
+
+        h1 {
+            margin-bottom: 0.2em;
+        }
+
+        p {
+            margin-top: 0;
+            margin-bottom: 1em;
+            color: #999;
+        }
+
+        #funfact {
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>🛰️💥🕳️ No Forwarding Address Found 🕳️💥🛰️</h1>
+    <p>But here's a random dev quote to brighten your day:</p>
+
+    <div class="quote-box">
+        <div id="quote" class="quote">Loading quote...</div>
+        <div id="author" class="author">Loading author...</div>
+    </div>
+
+    <p>And here's something else you probably didn't need to know:</p>
+    <div class="quote-box fun-box">
+        <div id="funfact" class="quote">Loading fun fact...</div>
+    </div>
+
+    <script>
+        const quotes = [
+            { text: "Weeks of coding can save you hours of planning.", author: "Anonymous" },
+            { text: "To understand recursion, one must first understand recursion.", author: "Unknown" },
+            { text: "It's not a bug — it's an undocumented feature.", author: "Every developer ever" },
+            { text: "There are two hard things in computer science: cache invalidation, naming things, and off-by-one errors.", author: "Phil Karlton (probably)" },
+            { text: "Why do programmers always mix up Halloween and Christmas? Because Oct 31 == Dec 25.", author: "Anonymous" }
+        ];
+
+        const funFacts = [
+            // Funny facts, Trump jabs, absurd trivia
+            "Donald Trump claimed 'windmills cause cancer'. Meanwhile, fossil fuels just cause the planet to melt.",
+            "Stack Overflow was down for 20 minutes once. 10,000 devs remembered they had families.",
+            "If a tree falls in the forest and no one is around, does it still break the CI pipeline?",
+            "A programmer's diet: 90% coffee, 10% existential dread.",
+            "Trump once said he 'knows words, he has the best words.' Then spelled 'coffee' as 'covfefe'.",
+            "Your VPN is more secure than your government.",
+            "JavaScript can’t tell the difference between 0 and false. Neither can Congress.",
+            "AI will replace all jobs — except politicians. They are still immune to intelligence.",
+            "There are more lines of code in a modern car than in Windows 95 — and about the same number of crashes.",
+            "A camel can survive 2 weeks without water. Your code survives 2 years without a comment.",
+
+            // Poems
+            `Roses are #FF0000,\nViolets are #0000FF,\nYour code compiled on first try?\nWhat black magic did you do?`,
+            `The server is down,\nAgain with no warning,\nThe logs say it's fine,\nBut I'm mourning.`,
+            `My code runs fast,\nMy tests all pass,\nIt’s Friday night —\nDeploy to prod? ...I'll pass.`,
+            `Tabs or spaces,\nA war with no end,\nBut both will break,\nIf alignment's your friend.`,
+
+            // Weird but true
+            "Sharks are older than trees. Much like your legacy COBOL system.",
+            "The moon is slowly moving away from Earth. So is your Wi-Fi router, emotionally.",
+            "You blink ~20 times per minute. That's 20 missed bugs per code review.",
+            "The word 'algorithm' comes from a Persian mathematician. The bugs, however, are all yours.",
+            "Hot water can freeze faster than cold. Just like hot takes on Twitter."
+        ];
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(
+                    crypto.getRandomValues(new Uint32Array(1))[0] / (2 ** 32) * (i + 1)
+                );
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        const shuffledQuotes = shuffle([...quotes]);
+        const shuffledFacts = shuffle([...funFacts]);
+
+        const random = shuffledQuotes[0];
+        const randomFact = shuffledFacts[0];
+
+        document.getElementById('quote').textContent = `"${random.text}"`;
+        document.getElementById('author').textContent = `– ${random.author}`;
+        document.getElementById('funfact').textContent = randomFact;
+    </script>
