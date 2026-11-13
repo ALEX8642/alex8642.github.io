@@ -80,6 +80,8 @@ ul.clean { list-style: none; margin: 0; padding: 0; }
 .actor { position: absolute; left: 0; top: 0; will-change: transform; }
 .actor svg { display: block; width: 56px; height: 56px; fill: none; stroke: var(--cyan); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 4px var(--cyan)); }
 .actor.big svg { width: 84px; height: 84px; }
+.actor.small svg { width: 40px; height: 40px; }
+.actor.red svg { stroke: #ff6b6b; filter: drop-shadow(0 0 4px #ff6b6b); }
 .actor.pink svg { stroke: var(--pink); filter: drop-shadow(0 0 4px var(--pink)); }
 .actor.gold svg { stroke: var(--gold); filter: drop-shadow(0 0 4px var(--gold)); }
 .bubble { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); white-space: nowrap; background: #0e1424; color: #e6ebf5; border: 1px solid var(--pink); border-radius: 10px; padding: 3px 9px; font-size: 13px; }
@@ -349,11 +351,22 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
   });
 
   // ---- cameos: rare sci-fi drive-bys (decorative; none under reduced motion) ----
+  const V = (inner) => '<svg viewBox="0 0 64 64">' + inner + '</svg>';
   const SVG = {
+    ripley: V('<circle cx="30" cy="12" r="6"/><path d="M35 10q8 1 6 9M30 18l-2 20M29 24l-10 7M30 24l12-6M28 38l-8 14M28 38l12 10"/>'),
+    xeno: V('<path d="M6 36C12 14 40 8 52 24C44 24 38 27 34 33z"/><path d="M34 33C42 37 46 45 43 53M38 40l9 6M41 36l11-3M43 53C54 62 60 52 63 40M10 35l5-3M13 37l5-3"/>'),
+    hugger: V('<ellipse cx="32" cy="30" rx="11" ry="7"/><path d="M23 28l-12-10M22 31l-14 1M23 34l-12 10M28 36l-8 15M41 28l12-10M42 31l14 1M41 34l12 10M36 36l8 15M32 37q0 12 13 15"/>'),
+    rocket: V('<path d="M12 36h28q14 6 0 12h-28z"/><path d="M12 36l-7-7v9M12 48l-7 7v-9M5 42l-5-3M5 42l-5 3"/><circle cx="26" cy="42" r="3"/><circle cx="26" cy="22" r="4.5"/><path d="M26 27v9M26 31l9-5M22 20l-3-5M30 20l3-5"/>'),
+    pod: V('<path d="M12 40q20-26 40 0z"/><path d="M12 40h40M14 40l-9-4M14 43l-9 4"/><circle cx="32" cy="30" r="4"/>'),
+    data: V('<circle cx="30" cy="11" r="7"/><path d="M26 11h8"/><rect x="22" y="21" width="16" height="18" rx="3"/><path d="M22 25l-9 8M38 25l10-6M26 39l-7 14M34 39l9 11"/>'),
+    spot: V('<ellipse cx="28" cy="40" rx="16" ry="9"/><circle cx="49" cy="33" r="7"/><path d="M44 28l-1-8 6 4M52 27l3-7 1 9M12 38q-10-10-3-21M20 48v9M26 49v9M36 49v9M42 48v9"/>'),
+    kratos: V('<circle cx="34" cy="10" r="7"/><path d="M28 14q6 12 12 0"/><path d="M22 22h24l-4 20H26zM22 24l-12 10M46 24l8 14M29 42l-5 16M39 42l5 16"/><path d="M6 14l6 24M2 22q-3 8 6 12q4-8-6-12"/>'),
+    boy: V('<circle cx="28" cy="14" r="5"/><path d="M28 19l-1 17M27 24l-8 6M28 24l9 4M27 36l-7 14M27 36l10 10"/>'),
     astronaut: '<svg viewBox="0 0 64 64"><circle cx="32" cy="18" r="11"/><ellipse cx="32" cy="18" rx="7" ry="5"/><rect x="22" y="30" width="20" height="20" rx="6"/><path d="M22 34l-9 8M42 34l9 8M27 50l-4 11M37 50l4 11"/><path d="M42 36q14 6 12 22" stroke-dasharray="2 3"/></svg>',
   };
   const CAMEOS = {};
   let lastCameo = "", cameoBusy = false;
+  const forcedCameo = new URLSearchParams(location.search).get("cameo");
 
   const lane = (vh) => vh * (Math.random() < 0.5 ? 0.08 + Math.random() * 0.12 : 0.72 + Math.random() * 0.15);
   const dash = (el, from, to, ms, delay = 0) =>
@@ -368,6 +381,32 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
     return { el, svg: el.querySelector("svg") };
   }
 
+  // one actor crossing the viewport: p = {svg, text, cls, y, ms, delay, dir, dy, bob}
+  const cross = (layer, p) => {
+    const vw = innerWidth, a = actor(layer, p.svg, p.text, p.cls || "");
+    const [x0, x1] = (p.dir || 1) > 0 ? [-110, vw + 110] : [vw + 110, -110];
+    const dy = p.dy ?? -40, delay = p.delay || 0;
+    const out = [a.el.animate([{ transform: `translate(${x0}px, ${p.y}px)` }, { transform: `translate(${x1}px, ${p.y + dy}px)` }],
+      { duration: p.ms, delay, easing: "linear", fill: "both" })];
+    if (p.bob) out.push(a.svg.animate([{ transform: "translateY(0)" }, { transform: `translateY(${-p.bob}px)` }],
+      { duration: 250, delay, iterations: Math.max(1, Math.floor(p.ms / 250)), direction: "alternate", easing: "ease-in-out", fill: "both" }));
+    return out;
+  };
+
+  CAMEOS.ripley = (layer) => { const y = lane(innerHeight); return [
+    ...cross(layer, { svg: SVG.ripley, text: "…it's behind me, isn't it.", cls: "small", y, ms: 7000, bob: 4 }),
+    ...cross(layer, { svg: SVG.xeno, cls: "big pink", y: y - 14, ms: 6000, delay: 3000, bob: 3 })]; };
+  CAMEOS.hugger = (layer) => cross(layer, { svg: SVG.hugger, text: "FREE HUGS", cls: "pink", y: innerHeight - 76, dy: 0, ms: 8000, dir: -1, bob: 3 });
+  CAMEOS.kirk = (layer) => { const y = lane(innerHeight); return [
+    ...cross(layer, { svg: SVG.rocket, cls: "big gold", y, ms: 8000 }),
+    ...cross(layer, { svg: SVG.pod, text: "Spock, wait up!", y: y + 12, ms: 8000, delay: 700, bob: 2 })]; };
+  CAMEOS.data = (layer) => { const y = lane(innerHeight); return [
+    ...cross(layer, { svg: SVG.spot, cls: "small", y: y + 14, ms: 8000, bob: 5 }),
+    ...cross(layer, { svg: SVG.data, text: "Spot! Spot! Spot!", y, ms: 8000, delay: 600, bob: 4 })]; };
+  CAMEOS.kratos = (layer) => { const y = lane(innerHeight); return [
+    ...cross(layer, { svg: SVG.boy, cls: "small", y: y + 18, ms: 8000, bob: 5 }),
+    ...cross(layer, { svg: SVG.kratos, text: "BOYYYYYY!", cls: "big red", y, ms: 8000, delay: 900, bob: 6 })]; };
+
   CAMEOS.astronaut = (layer) => {
     const vw = innerWidth, y = lane(innerHeight);
     const a = actor(layer, SVG.astronaut, "Murph?!", "gold");
@@ -381,6 +420,7 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
     if (calm || document.hidden || cameoBusy) return false;
     const keys = Object.keys(CAMEOS);
     const pool = keys.filter((k) => k !== lastCameo);
+    if (!CAMEOS[name]) name = forcedCameo;
     name = CAMEOS[name] ? name : (pool.length ? pool : keys)[Math.floor(Math.random() * (pool.length || keys.length))];
     cameoBusy = true; lastCameo = name;
     const layer = document.createElement("div");
