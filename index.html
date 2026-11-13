@@ -20,7 +20,7 @@ body {
   overflow-x: hidden;
 }
 #bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; display: block; }
-main { position: relative; z-index: 1; max-width: 880px; margin: 0 auto; padding: 32px 16px 64px; }
+main { overflow-x: clip; position: relative; z-index: 1; max-width: 880px; margin: 0 auto; padding: 32px 16px 64px; }
 a { color: var(--cyan); text-underline-offset: 3px; }
 a:hover { color: var(--pink); }
 a:focus-visible, button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 4px; }
@@ -42,7 +42,7 @@ h2::before { content: "▸ "; color: var(--cyan); }
   box-shadow: 0 0 0 1px rgba(255,78,205,.15), 0 12px 40px rgba(0,0,0,.45);
 }
 .card-top { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
-#title { margin: 0; font-size: clamp(30px, 8vw, 54px); line-height: 1.05; letter-spacing: .04em; color: var(--ink); overflow-wrap: anywhere; }
+#title { min-height: 1.05em; margin: 0; font-size: clamp(30px, 8vw, 54px); line-height: 1.05; letter-spacing: .04em; color: var(--ink); overflow-wrap: anywhere; }
 .class { margin: 6px 0 0; color: var(--gold); letter-spacing: .12em; text-transform: uppercase; font-size: 14px; }
 .tagline { margin: 14px 0 0; color: var(--dim); max-width: 52ch; }
 #level {
@@ -73,7 +73,7 @@ ul.clean { list-style: none; margin: 0; padding: 0; }
 .facts li { margin: 8px 0; padding-left: 1.4em; position: relative; }
 .facts li::before { content: "✦"; position: absolute; left: 0; color: var(--gold); }
 footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28px; }
-.hint { opacity: .7; font-size: 12px; margin-top: 6px; }
+.hint { font-size: 12px; margin-top: 6px; }
 
 /* effects (only active when JS adds .fx and motion is allowed) */
 .fx #card { transition: transform .15s ease-out; }
@@ -113,7 +113,7 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
         <h1 id="title">ALEX8642</h1>
         <p class="class">Class: Industrial AI Engineer</p>
       </div>
-      <button id="level" type="button" aria-label="Level 8642. Click for a surprise.">LVL 8642</button>
+      <button id="level" type="button" aria-label="LVL 8642 — click for a surprise">LVL 8642</button>
     </div>
     <p class="tagline">I turn messy factory data and very large GPUs into things that actually work — then build a homelab to run them on.</p>
   </header>
@@ -139,7 +139,7 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
       <li class="quest"><a href="https://github.com/Alex8642/wafer-deploy">wafer-deploy</a>
         <p>FastAPI serving with drift monitoring (MMD, PSI, ECE), a retrain trigger, Prometheus and Grafana.</p></li>
       <li class="quest"><a href="https://github.com/Alex8642/wafer-rootcause">wafer-rootcause</a>
-        <p>SQL root-cause pipeline: spatial defect signatures traced back to the tool and chamber.</p></li>
+        <p>SQL root-cause pipeline on simulated MES data: spatial defect signatures traced back to the tool and chamber.</p></li>
       <li class="quest"><a href="https://github.com/Alex8642/audio2report">audio2report</a>
         <p>Dual-mic meeting recordings to clean transcripts and LLM-written audit reports, fully local.</p></li>
       <li class="quest"><a href="https://github.com/Alex8642/itb-site">itb-site</a>
@@ -189,8 +189,10 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
     let w = 0, h = 0, stars = [];
     const resize = () => {
       const dpr = Math.min(devicePixelRatio || 1, 2);
-      w = canvas.width = Math.floor(innerWidth * dpr);
+      const nw = Math.floor(innerWidth * dpr);
       h = canvas.height = Math.floor(innerHeight * dpr);
+      if (nw === w && stars.length) { for (const s of stars) if (s.y > h) s.y = Math.random() * h; return; }
+      w = canvas.width = nw;
       stars = Array.from({ length: 120 }, () => ({
         x: Math.random() * w, y: Math.random() * h,
         r: (0.4 + Math.random() * 1.4) * dpr, v: (0.05 + Math.random() * 0.25) * dpr,
@@ -205,17 +207,20 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
         ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.283); ctx.fill();
       }
     };
-    const step = () => {
-      for (const s of stars) { s.y += s.v; if (s.y > h) { s.y = 0; s.x = Math.random() * w; } }
+    let raf = 0, last = 0;
+    const step = (dt) => {
+      for (const s of stars) { s.y += s.v * dt; if (s.y > h) { s.y = 0; s.x = Math.random() * w; } }
       draw();
     };
-    let raf = 0;
-    const loop = () => { step(); raf = requestAnimationFrame(loop); };
+    const loop = (now = performance.now()) => {
+      const dt = last ? Math.min((now - last) / 16.67, 3) : 1;
+      last = now; step(dt); raf = requestAnimationFrame(loop);
+    };
     resize(); draw();
     addEventListener("resize", () => { resize(); draw(); });
     if (calm) return;
     document.addEventListener("visibilitychange", () => {
-      cancelAnimationFrame(raf);
+      cancelAnimationFrame(raf); last = 0;
       if (!document.hidden) loop();
     });
     loop();
@@ -272,7 +277,7 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
   level.addEventListener("click", () => {
     lvl += 1;
     level.textContent = "LVL " + lvl;
-    level.setAttribute("aria-label", "Level " + lvl + ". Click for a surprise.");
+    level.setAttribute("aria-label", "LVL " + lvl + " — click for a surprise");
     card.querySelectorAll(".burst").forEach((b) => b.remove());
     say("LEVEL UP!");
   });
@@ -307,7 +312,7 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
   let pos = 0;
   addEventListener("keydown", (e) => {
     const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-    pos = k === code[pos] ? pos + 1 : (k === code[0] ? 1 : 0);
+    pos = k === code[pos] ? pos + 1 : (k === code[0] ? (pos === 2 ? 2 : 1) : 0);
     if (pos === code.length) { pos = 0; say("+30 LIVES"); confetti(); }
   });
 
