@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>404 — No Forwarding Address Found</title>
+<style>
+:root { --bg: #0a0d16; --panel: #121827; --ink: #e6ebf5; --dim: #93a0bd; --cyan: #4de1ff; --pink: #ff4ecd; }
+* { box-sizing: border-box; }
+html { color-scheme: dark; }
+body {
+  margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px 16px;
+  background: radial-gradient(circle at 50% 0%, #16203a, var(--bg) 60%); color: var(--ink);
+  font: 16px/1.55 ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+}
+main { width: 100%; max-width: 640px; text-align: center; }
+h1 { margin: 0 0 8px; font-size: clamp(22px, 6vw, 34px); line-height: 1.2; overflow-wrap: anywhere; }
+.code { color: var(--pink); letter-spacing: .3em; font-size: 14px; text-transform: uppercase; }
+.card { margin-top: 24px; padding: 18px 20px; background: var(--panel); border: 1px solid #26314d; border-radius: 14px; }
+.card p { margin: 0 0 10px; }
+.dim { color: var(--dim); font-size: 14px; }
+#quote { color: var(--cyan); }
+a { color: var(--cyan); text-underline-offset: 3px; }
+a:hover { color: var(--pink); }
+a:focus-visible { outline: 3px solid #ffd166; outline-offset: 3px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="code">404</div>
+  <h1><span aria-hidden="true">🛰️💥🕳️</span> No Forwarding Address Found <span aria-hidden="true">🕳️💥🛰️</span></h1>
+  <div class="card">
+    <p>Yes, this is exactly how <strong>alex8642.github.io</strong> started: a page like this was the entire site for over a year.</p>
+    <p class="dim">But here's a random dev quote to brighten your day:</p>
+    <p id="quote">"It works on my machine."</p>
+  </div>
+  <p><a href="/">← Back to the character sheet</a></p>
+</main>
+<script>
+(() => {
+  const quotes = [
+    "It works on my machine.",
+    "There are only two hard things in computer science: cache invalidation, naming things, and off-by-one errors.",
+    "A SQL query walks into a bar, walks up to two tables and asks: \"Can I join you?\"",
+    "Have you tried turning it off and on again?",
+    "It's not a bug, it's an undocumented feature.",
+    "Weeks of coding can save you hours of planning.",
+  ];
+  document.getElementById("quote").textContent = "\"" + quotes[Math.floor(Math.random() * quotes.length)].replace(/^"|"$/g, "") + "\"";
+})();
+</script>
+</body>
+</html>

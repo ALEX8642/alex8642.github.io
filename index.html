@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ALEX8642 — Character Sheet</title>
 <meta name="description" content="Industrial AI, wafer-defect ML, on-prem LLMs and a homelab that got out of hand.">
+<script>try{var t=JSON.parse(localStorage.getItem("a8642")||"{}").theme;if(t==="matrix"||t==="synthwave")document.documentElement.dataset.theme=t;}catch(e){}</script>
 <!-- PLACEHOLDER: class title, tagline, fun facts and loadout are drafts — confirm with Alex -->
 <style>
 :root {
@@ -12,6 +13,8 @@
   --cyan: #4de1ff; --pink: #ff4ecd; --gold: #ffd166;
   --shine: 50% 0%;
 }
+html[data-theme="matrix"] { --bg: #020a04; --panel: #08160c; --ink: #d2ffdc; --dim: #8fd4a0; --cyan: #3dff7a; --pink: #b8ff3d; --gold: #e8ff7a; }
+html[data-theme="synthwave"] { --bg: #12041f; --panel: #1f0b36; --ink: #f7ecff; --dim: #bfa3e0; --cyan: #00e5ff; --pink: #ff3fa4; --gold: #ffb347; }
 * { box-sizing: border-box; }
 html { color-scheme: dark; }
 body {
@@ -54,8 +57,13 @@ h2::before { content: "▸ "; color: var(--cyan); }
 
 /* stats */
 .stat { display: grid; grid-template-columns: 9.5em 1fr 3em; gap: 12px; align-items: center; margin: 10px 0; }
+.stat { position: relative; }
 .stat > span:first-child { color: var(--dim); }
-.stat > span:last-child { text-align: right; color: var(--cyan); }
+.stat > span:nth-child(3) { text-align: right; color: var(--cyan); }
+.stat:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 6px; }
+.tip { display: none; position: absolute; left: 0; bottom: calc(100% + 4px); z-index: 6; width: max-content; max-width: min(320px, calc(100vw - 80px));
+  padding: 4px 10px; background: #0e1424; color: var(--ink); border: 1px solid var(--pink); border-radius: 8px; font-size: 13px; pointer-events: none; }
+.stat:hover .tip, .stat:focus .tip { display: block; }
 .track { display: block; height: 12px; border-radius: 99px; background: #0b1020; border: 1px solid #26314d; overflow: hidden; }
 .bar { display: block; height: 100%; width: var(--v); border-radius: 99px; background: linear-gradient(90deg, var(--cyan), var(--pink)); box-shadow: 0 0 10px rgba(77,225,255,.6); }
 
@@ -72,6 +80,22 @@ ul.clean { list-style: none; margin: 0; padding: 0; }
 .dot { width: 10px; height: 10px; border-radius: 50%; background: #3ddc84; box-shadow: 0 0 8px #3ddc84; flex: none; }
 @media (prefers-reduced-motion: no-preference) { .dot { animation: ping 2s ease-in-out infinite; } }
 @keyframes ping { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+
+/* extras: tools, toast, terminal, trail */
+.tools { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 16px; margin-top: 10px; font-size: 12px; color: var(--dim); }
+.tools .linkish[aria-pressed="true"] { color: var(--gold); text-decoration: none; font-weight: 700; }
+#toast { position: fixed; left: 12px; bottom: 12px; z-index: 20; display: grid; gap: 6px; max-width: calc(100vw - 24px); pointer-events: none; opacity: 0; transition: opacity .3s; }
+#toast.show { opacity: 1; }
+#toast div { background: #0e1424; color: var(--ink); border: 1px solid var(--gold); border-radius: 10px; padding: 8px 12px; font-size: 13px; }
+#term { position: fixed; left: 8px; right: 8px; bottom: 8px; z-index: 30; max-width: 720px; margin: 0 auto; background: #05070d; border: 1px solid var(--cyan); border-radius: 12px; box-shadow: 0 0 28px rgba(0,0,0,.7); font-size: 14px; }
+#term[hidden] { display: none; }
+#term-out { max-height: 38vh; overflow-y: auto; padding: 10px 12px; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--ink); }
+#term-form { display: flex; gap: 8px; align-items: center; padding: 8px 12px; border-top: 1px solid #26314d; }
+#term-form:focus-within { border-top-color: var(--gold); }
+#term-form label { color: var(--cyan); white-space: nowrap; }
+#term-input { flex: 1; min-width: 0; font: inherit; color: var(--ink); background: transparent; border: 0; outline: 0; }
+#trail { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 3; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { #toast { transition: none; } }
 
 /* cameos */
 .linkish { font: inherit; font-size: 12px; background: none; border: 0; padding: 2px 4px; color: var(--cyan); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
@@ -146,12 +170,12 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
 
   <section class="panel" aria-labelledby="stats-h">
     <h2 id="stats-h">Stats</h2>
-    <div class="stat"><span>Machine learning</span><span class="track"><span class="bar" data-value="90" style="--v:90%"></span></span><span>90</span></div>
-    <div class="stat"><span>Wafer defects</span><span class="track"><span class="bar" data-value="85" style="--v:85%"></span></span><span>85</span></div>
-    <div class="stat"><span>Homelab</span><span class="track"><span class="bar" data-value="100" style="--v:100%"></span></span><span>100</span></div>
-    <div class="stat"><span>Security</span><span class="track"><span class="bar" data-value="95" style="--v:95%"></span></span><span>95</span></div>
-    <div class="stat"><span>Home theater</span><span class="track"><span class="bar" data-value="80" style="--v:80%"></span></span><span>80</span></div>
-    <div class="stat"><span>Sleep</span><span class="track"><span class="bar" data-value="35" style="--v:35%"></span></span><span>35</span></div>
+    <div class="stat" tabindex="0" aria-describedby="tip-ml"><span>Machine learning</span><span class="track"><span class="bar" data-value="90" style="--v:90%"></span></span><span>90</span><span class="tip" id="tip-ml" role="tooltip">Overfits only on weekends.</span></div>
+    <div class="stat" tabindex="0" aria-describedby="tip-wafer"><span>Wafer defects</span><span class="track"><span class="bar" data-value="85" style="--v:85%"></span></span><span>85</span><span class="tip" id="tip-wafer" role="tooltip">Can spot a scratch from orbit.</span></div>
+    <div class="stat" tabindex="0" aria-describedby="tip-lab"><span>Homelab</span><span class="track"><span class="bar" data-value="100" style="--v:100%"></span></span><span>100</span><span class="tip" id="tip-lab" role="tooltip">Goes to 11. Then to 100.</span></div>
+    <div class="stat" tabindex="0" aria-describedby="tip-sec"><span>Security</span><span class="track"><span class="bar" data-value="95" style="--v:95%"></span></span><span>95</span><span class="tip" id="tip-sec" role="tooltip">Paranoid, but with logs.</span></div>
+    <div class="stat" tabindex="0" aria-describedby="tip-theater"><span>Home theater</span><span class="track"><span class="bar" data-value="80" style="--v:80%"></span></span><span>80</span><span class="tip" id="tip-theater" role="tooltip">Subwoofer registers on seismographs.</span></div>
+    <div class="stat" tabindex="0" aria-describedby="tip-sleep"><span>Sleep</span><span class="track"><span class="bar" data-value="35" style="--v:35%"></span></span><span>35</span><span class="tip" id="tip-sleep" role="tooltip">Generously rounded.</span></div>
   </section>
 
   <section class="panel" aria-labelledby="quests-h">
@@ -213,18 +237,38 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
     <a href="https://github.com/Alex8642">github.com/Alex8642</a>
     <div class="hint">psst — the level badge is clickable. Old-school codes also work.
       <button id="summon" class="linkish" type="button" hidden>Or click here for a surprise.</button></div>
+    <div class="tools" hidden>
+      <span id="ach-count" hidden>🏆 <span>0/8</span> achievements</span>
+      <button id="open-term" class="linkish" type="button">$_ terminal</button>
+      <span class="themes" role="group" aria-label="Theme">theme:
+        <button class="linkish" type="button" data-theme-btn="neon" aria-pressed="true">neon</button>
+        <button class="linkish" type="button" data-theme-btn="matrix" aria-pressed="false">matrix</button>
+        <button class="linkish" type="button" data-theme-btn="synthwave" aria-pressed="false">synthwave</button></span>
+    </div>
   </footer>
 </main>
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="term" role="dialog" aria-label="Hidden terminal" hidden>
+  <div id="term-out" role="log" aria-live="polite"></div>
+  <form id="term-form" autocomplete="off">
+    <label for="term-input">visitor@alex8642:~$</label>
+    <input id="term-input" aria-label="Terminal command" autocomplete="off" autocapitalize="off" spellcheck="false">
+  </form>
+</div>
 <script>
 (() => {
   "use strict";
   const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $ = (s) => document.querySelector(s);
   const card = $("#card"), title = $("#title"), level = $("#level");
+  const toast = $("#toast"), achCount = $("#ach-count"), term = $("#term"), termOut = $("#term-out"), termIn = $("#term-input");
+  let repaintStars = () => {};
 
   function starfield(canvas) {
     const ctx = canvas.getContext("2d");
     let w = 0, h = 0, stars = [];
+    const css = (k, d) => getComputedStyle(document.documentElement).getPropertyValue(k).trim() || d;
+    let colors = [css("--cyan", "#4de1ff"), css("--pink", "#ff4ecd")];
     const resize = () => {
       const dpr = Math.min(devicePixelRatio || 1, 2);
       const nw = Math.floor(innerWidth * dpr);
@@ -234,14 +278,14 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
       stars = Array.from({ length: 120 }, () => ({
         x: Math.random() * w, y: Math.random() * h,
         r: (0.4 + Math.random() * 1.4) * dpr, v: (0.05 + Math.random() * 0.25) * dpr,
-        c: Math.random() < 0.2 ? "#ff4ecd" : "#4de1ff",
+        k: Math.random() < 0.2 ? 1 : 0,
       }));
     };
     const draw = () => {
       ctx.clearRect(0, 0, w, h);
       for (const s of stars) {
         ctx.globalAlpha = 0.35 + s.r / 4;
-        ctx.fillStyle = s.c;
+        ctx.fillStyle = colors[s.k];
         ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.283); ctx.fill();
       }
     };
@@ -255,6 +299,7 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
       last = now; step(dt); raf = requestAnimationFrame(loop);
     };
     resize(); draw();
+    repaintStars = () => { colors = [css("--cyan", "#4de1ff"), css("--pink", "#ff4ecd")]; draw(); };
     addEventListener("resize", () => { resize(); draw(); });
     if (calm) return;
     document.addEventListener("visibilitychange", () => {
@@ -318,6 +363,7 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
     level.setAttribute("aria-label", "LVL " + lvl + " — click for a surprise");
     card.querySelectorAll(".burst").forEach((b) => b.remove());
     say("LEVEL UP!");
+    if (lvl - 8642 >= 10) unlock("grinder");
   });
 
   function confetti() {
@@ -347,12 +393,170 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
   }
 
   const code = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
-  let pos = 0;
+  let pos = 0, typed = "";
   addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !term.hidden) { closeTerm(); return; }
+    if (e.target === termIn || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.key === "`") { e.preventDefault(); if (term.hidden) openTerm(); else closeTerm(); return; }
+    if (e.key.length === 1) { typed = (typed + e.key.toLowerCase()).slice(-4); if (typed === "sudo") { typed = ""; openTerm(); } }
     const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
     pos = k === code[pos] ? pos + 1 : (k === code[0] ? (pos === 2 ? 2 : 1) : 0);
-    if (pos === code.length) { pos = 0; say("+30 LIVES"); confetti(); }
+    if (pos === code.length) { pos = 0; say("+30 LIVES"); confetti(); unlock("old-school"); }
   });
+
+  // ---- extras: local-only achievements, hidden terminal, themes, cursor trail ----
+  const store = (() => {
+    let mem = { ach: [], seen: [] };
+    try { const r = JSON.parse(localStorage.getItem("a8642") || "null"); if (r && typeof r === "object") mem = { ...mem, ...r }; } catch (e) {}
+    // merge with whatever another tab/page saved meanwhile, so nothing earned is ever lost
+    const save = () => { try {
+      const cur = JSON.parse(localStorage.getItem("a8642") || "{}");
+      for (const k of ["ach", "seen"]) mem[k] = [...new Set([...(Array.isArray(cur[k]) ? cur[k] : []), ...mem[k]])];
+      localStorage.setItem("a8642", JSON.stringify(mem));
+    } catch (e) {} };
+    return { get: (k) => mem[k], set: (k, v) => { mem[k] = v; save(); } };
+  })();
+  const ACH = [["first-contact", "First Contact"], ["hunter", "Cameo Hunter"], ["completionist", "Completionist"], ["grinder", "Level Grinder"],
+    ["old-school", "Old School"], ["root", "Root Access"], ["stylist", "Style Points"], ["bottom", "Deep Reader"]];
+
+  function updateAch() {
+    const n = store.get("ach").length;
+    achCount.hidden = n === 0;
+    achCount.querySelector("span").textContent = n + "/" + ACH.length;
+  }
+  function unlock(id) {
+    const have = store.get("ach");
+    if (have.includes(id)) return;
+    store.set("ach", [...have, id]);
+    const line = document.createElement("div");
+    line.textContent = "🏆 Achievement unlocked: " + ACH.find((a) => a[0] === id)[1];
+    toast.appendChild(line); toast.classList.add("show");
+    setTimeout(() => { line.remove(); if (!toast.firstChild) toast.classList.remove("show"); }, 4500);
+    updateAch();
+  }
+  function markSeen(name) {
+    const seen = store.get("seen");
+    if (!seen.includes(name)) store.set("seen", [...seen, name]);
+    unlock("first-contact");
+    const n = store.get("seen").length;
+    if (n >= 3) unlock("hunter");
+    if (n >= Object.keys(CAMEOS).length) unlock("completionist");
+  }
+
+  // themes
+  const THEMES = ["neon", "matrix", "synthwave"];
+  function setTheme(t, user) {
+    if (!THEMES.includes(t)) t = "neon";
+    if (t === "neon") delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = t;
+    store.set("theme", t);
+    document.querySelectorAll("[data-theme-btn]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.themeBtn === t)));
+    repaintStars();
+    if (user) unlock("stylist");
+  }
+
+  // cursor trail (mouse only, off under reduced motion)
+  let trailOn = store.get("trail") !== false, trailCv = null, trailCtx = null, trailBits = [], trailRaf = 0, trailLast = 0;
+  function setTrail(on) {
+    trailOn = on; store.set("trail", on);
+    if (!on && trailCtx) { trailBits = []; trailCtx.clearRect(0, 0, trailCv.width, trailCv.height); }
+  }
+  function startTrail() {
+    trailCv = document.createElement("canvas"); trailCv.id = "trail"; trailCv.setAttribute("aria-hidden", "true");
+    document.body.appendChild(trailCv); trailCtx = trailCv.getContext("2d");
+    const fit = () => { trailCv.width = innerWidth; trailCv.height = innerHeight; };
+    fit(); addEventListener("resize", fit);
+    const vars = ["--cyan", "--pink", "--gold"];
+    const frame = (now) => {
+      trailCtx.clearRect(0, 0, trailCv.width, trailCv.height);
+      trailBits = trailBits.filter((p) => now - p.t < 700);
+      for (const p of trailBits) {
+        const age = Math.max(0, (now - p.t) / 700);
+        trailCtx.globalAlpha = 1 - age; trailCtx.fillStyle = p.c;
+        trailCtx.beginPath(); trailCtx.arc(p.x + p.vx * age * 20, p.y + p.vy * age * 20 + age * 12, p.r * (1 - age * 0.5), 0, 6.283); trailCtx.fill();
+      }
+      trailRaf = trailBits.length ? requestAnimationFrame(frame) : 0;
+    };
+    document.addEventListener("pointermove", (e) => {
+      if (!trailOn || e.pointerType === "touch") return;
+      const now = performance.now();
+      if (now - trailLast < 10) return;
+      trailLast = now;
+      const cs = getComputedStyle(document.documentElement);
+      trailBits.push({ x: e.clientX, y: e.clientY, vx: Math.random() - 0.5, vy: Math.random() - 0.5, r: 1.5 + Math.random() * 1.5,
+        c: cs.getPropertyValue(vars[(Math.random() * 3) | 0]).trim() || "#4de1ff", t: now });
+      if (trailBits.length > 60) trailBits.shift();
+      if (!trailRaf) trailRaf = requestAnimationFrame(frame);
+    });
+  }
+
+  // hidden terminal: ` or typing "sudo" (or the footer button) opens it; Esc closes it
+  const QUESTS = ["LLM-chatbot", "onprem-llm-stack", "wafer-defect-classifier", "wafer-deploy", "wafer-rootcause", "audio2report", "itb-site", "UNRAID_Scripts"];
+  const hist = []; let hpos = 0, termOpener = null;
+  function print(text) { const d = document.createElement("div"); d.textContent = text; termOut.appendChild(d); termOut.scrollTop = termOut.scrollHeight; }
+  function openTerm() {
+    if (!term.hidden) return;
+    termOpener = document.activeElement;
+    term.hidden = false;
+    if (!termOut.children.length) print("Welcome, visitor. Type 'help' (or 'exit').");
+    termIn.focus();
+  }
+  function closeTerm() {
+    if (term.hidden) return;
+    term.hidden = true;
+    const o = termOpener; termOpener = null;
+    if (o && o !== document.body && document.contains(o) && o.focus) o.focus(); else termIn.blur();
+  }
+  const COMMANDS = {
+    help: () => "help · whoami · ls · cat <file> · theme <neon|matrix|synthwave> · cameo · achievements · trail <on|off> · ping homelab · uname · coffee · sudo … · clear · exit",
+    whoami: () => "alex8642 — industrial AI engineer, homelab hoarder, collector of very large GPUs.",
+    ls: () => QUESTS.join("   "),
+    cat: (a) => !a[0] ? "cat: missing file"
+      : /secret/i.test(a[0]) ? "Nice try. There are no secrets here: public repos only."
+      : /^(about|readme)/i.test(a[0]) ? "Builds things that actually work, then builds a homelab to run them on."
+      : "cat: " + a[0] + ": No such file or directory",
+    theme: (a) => THEMES.includes(a[0]) ? (setTheme(a[0], true), "theme: " + a[0]) : "usage: theme <neon|matrix|synthwave>",
+    cameo: () => calm ? "The cameos are resting (reduced motion is on)." : cameo() ? "Look out the window…" : "One at a time, please.",
+    achievements: () => ACH.map(([id, name]) => (store.get("ach").includes(id) ? "[x] " : "[ ] ") + name).join("\n"),
+    trail: (a) => a[0] === "off" ? (setTrail(false), "trail: off") : a[0] === "on" ? (setTrail(true), "trail: on") : "usage: trail <on|off>",
+    ping: () => "64 bytes from homelab: it's fine. Probably.",
+    uname: () => "Linux alex8642 6.x-vibes #1 SMP too-many-GPUs x86_64 GNU/Linux",
+    coffee: () => "418 I'm a teapot.",
+    clear: () => { termOut.textContent = ""; return ""; },
+    exit: () => { closeTerm(); return ""; },
+  };
+  function run(line) {
+    const [cmd, ...args] = line.trim().split(/\s+/);
+    print("$ " + line);
+    if (!cmd) return;
+    let out;
+    if (cmd === "sudo") { unlock("root"); out = "visitor is not in the sudoers file. This incident will be reported."; }
+    else if (cmd === "rm") out = "Nice try. This is a static page.";
+    else if (Object.prototype.hasOwnProperty.call(COMMANDS, cmd)) out = COMMANDS[cmd](args);
+    else out = "command not found: " + cmd;
+    if (out) print(out);
+  }
+
+  function initExtras() {
+    $(".tools").hidden = false;
+    updateAch();
+    setTheme(store.get("theme") || "neon", false);
+    document.querySelectorAll("[data-theme-btn]").forEach((b) => b.addEventListener("click", () => setTheme(b.dataset.themeBtn, true)));
+    $("#open-term").addEventListener("click", openTerm);
+    $("#term-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const v = termIn.value; termIn.value = "";
+      if (v.trim()) hist.push(v);
+      hpos = hist.length;
+      run(v);
+    });
+    termIn.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowUp" && hist.length) { hpos = Math.max(0, hpos - 1); termIn.value = hist[hpos]; e.preventDefault(); }
+      else if (e.key === "ArrowDown") { hpos = Math.min(hist.length, hpos + 1); termIn.value = hist[hpos] || ""; e.preventDefault(); }
+    });
+    addEventListener("scroll", () => {
+      if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) unlock("bottom");
+    }, { passive: true });
+  }
 
   // ---- cameos: rare sci-fi drive-bys (decorative; none under reduced motion) ----
   const V = (inner) => '<svg viewBox="0 0 64 64">' + inner + '</svg>';
@@ -458,6 +662,7 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
     const pool = keys.filter((k) => !recentCameos.includes(k));   // nothing from the last 3 shown
     if (!known(name)) name = forcedCameo;
     name = known(name) ? name : (pool.length ? pool : keys)[Math.floor(Math.random() * (pool.length || keys.length))];
+    markSeen(name);
     cameoBusy = true; recentCameos.push(name); if (recentCameos.length > 3) recentCameos.shift();
     const layer = document.createElement("div");
     layer.className = "cameo"; layer.dataset.cameo = name; layer.setAttribute("aria-hidden", "true");
@@ -481,9 +686,10 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
   if (!calm) { summon.hidden = false; summon.addEventListener("click", () => cameo()); scheduleCameos(); }
 
   starfield($("#bg"));
+  initExtras();
   if (!calm) {
     document.documentElement.classList.add("fx");
-    tilt(); glitchTitle(); fillBars();
+    tilt(); glitchTitle(); fillBars(); startTrail();
   }
 })();
 </script>
