@@ -368,7 +368,11 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
   let lastCameo = "", cameoBusy = false;
   const forcedCameo = new URLSearchParams(location.search).get("cameo");
 
-  const lane = (vh) => vh * (Math.random() < 0.5 ? 0.08 + Math.random() * 0.12 : 0.72 + Math.random() * 0.15);
+  // keep bubbles (above) and 84 px sprites (below) inside the viewport, even on short landscape phones
+  const lane = (vh) => {
+    const top = 100 + Math.random() * Math.max(0, vh * 0.12), bottom = vh - 120 - Math.random() * Math.max(0, vh * 0.1);
+    return Math.max(100, Math.min(Math.random() < 0.5 ? top : bottom, vh - 120));
+  };
   const dash = (el, from, to, ms, delay = 0) =>
     el.animate([{ transform: from }, { transform: to }], { duration: ms, delay, easing: "linear", fill: "both" });
 
@@ -419,17 +423,21 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
   function cameo(name) {
     if (calm || document.hidden || cameoBusy) return false;
     const keys = Object.keys(CAMEOS);
+    const known = (n) => keys.includes(n);   // own keys only: never constructor/__proto__/toString
     const pool = keys.filter((k) => k !== lastCameo);
-    if (!CAMEOS[name]) name = forcedCameo;
-    name = CAMEOS[name] ? name : (pool.length ? pool : keys)[Math.floor(Math.random() * (pool.length || keys.length))];
+    if (!known(name)) name = forcedCameo;
+    name = known(name) ? name : (pool.length ? pool : keys)[Math.floor(Math.random() * (pool.length || keys.length))];
     cameoBusy = true; lastCameo = name;
     const layer = document.createElement("div");
     layer.className = "cameo"; layer.dataset.cameo = name; layer.setAttribute("aria-hidden", "true");
     document.body.appendChild(layer);
-    const done = () => { layer.remove(); cameoBusy = false; };
-    const anims = CAMEOS[name](layer);
-    Promise.allSettled(anims.map((a) => a.finished)).then(done);
-    setTimeout(done, 15000);
+    let ended = false, timer = 0;
+    const done = () => { if (ended) return; ended = true; clearTimeout(timer); layer.remove(); cameoBusy = false; };
+    timer = setTimeout(done, 15000);
+    try {
+      const anims = CAMEOS[name](layer);
+      Promise.allSettled(anims.map((a) => a.finished)).then(done);
+    } catch (e) { done(); }
     return true;
   }
 
