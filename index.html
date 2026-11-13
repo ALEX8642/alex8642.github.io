@@ -393,8 +393,13 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
     return true;
   }
 
+  function scheduleCameos() {
+    const fire = () => { cameo(); setTimeout(fire, 60000 + Math.random() * 120000); };
+    setTimeout(fire, 25000);
+  }
+
   const summon = $("#summon");
-  if (!calm) { summon.hidden = false; summon.addEventListener("click", () => cameo()); }
+  if (!calm) { summon.hidden = false; summon.addEventListener("click", () => cameo()); scheduleCameos(); }
 
   starfield($("#bg"));
   if (!calm) {
