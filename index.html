@@ -23,7 +23,7 @@ body {
   overflow-x: hidden;
 }
 #bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; display: block; }
-main { overflow-x: clip; position: relative; z-index: 1; max-width: 880px; margin: 0 auto; padding: 32px 16px 64px; }
+main { position: relative; z-index: 1; max-width: 880px; margin: 0 auto; padding: 32px 16px 64px; }
 a { color: var(--cyan); text-underline-offset: 3px; }
 a:hover { color: var(--pink); }
 a:focus-visible, button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 4px; }
@@ -75,11 +75,13 @@ ul.clean { list-style: none; margin: 0; padding: 0; }
 .quest a { font-weight: 700; overflow-wrap: anywhere; }
 .quest p { margin: 4px 0 0; color: var(--dim); font-size: 14px; }
 
-.status-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 0 0 8px; }
-.status small { color: var(--dim); font-size: 12px; }
-.dot { width: 10px; height: 10px; border-radius: 50%; background: #3ddc84; box-shadow: 0 0 8px #3ddc84; flex: none; }
-@media (prefers-reduced-motion: no-preference) { .dot { animation: ping 2s ease-in-out infinite; } }
-@keyframes ping { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+
+@media (max-width: 960px) { main { overflow-x: clip; } }   /* the tilted card can poke out a few px only on narrow screens */
+.sub-h { margin: 20px 0 8px; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); }
+.sub-h:first-of-type { margin-top: 0; }
+.quests.shipped { grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); }
+.cat { display: block; margin-bottom: 2px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); }
+.quest strong { overflow-wrap: anywhere; }
 
 /* extras: tools, toast, terminal, trail */
 .tools { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 16px; margin-top: 10px; font-size: 12px; color: var(--dim); }
@@ -165,21 +167,22 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
       </div>
       <button id="level" type="button" aria-label="LVL 8642 — click for a surprise">LVL 8642</button>
     </div>
-    <p class="tagline">I turn messy factory data and very large GPUs into things that actually work — then build a homelab to run them on.</p>
+    <p class="tagline">Industrial AI engineer. I build and evaluate ML systems, from wafer-defect classifiers to on-prem LLMs, and run them on infrastructure I design, secure and operate myself.</p>
   </header>
 
   <section class="panel" aria-labelledby="stats-h">
     <h2 id="stats-h">Stats</h2>
-    <div class="stat" tabindex="0" aria-describedby="tip-ml"><span>Machine learning</span><span class="track"><span class="bar" data-value="90" style="--v:90%"></span></span><span>90</span><span class="tip" id="tip-ml" role="tooltip">Overfits only on weekends.</span></div>
-    <div class="stat" tabindex="0" aria-describedby="tip-wafer"><span>Wafer defects</span><span class="track"><span class="bar" data-value="85" style="--v:85%"></span></span><span>85</span><span class="tip" id="tip-wafer" role="tooltip">Can spot a scratch from orbit.</span></div>
-    <div class="stat" tabindex="0" aria-describedby="tip-lab"><span>Homelab</span><span class="track"><span class="bar" data-value="100" style="--v:100%"></span></span><span>100</span><span class="tip" id="tip-lab" role="tooltip">Goes to 11. Then to 100.</span></div>
-    <div class="stat" tabindex="0" aria-describedby="tip-sec"><span>Security</span><span class="track"><span class="bar" data-value="95" style="--v:95%"></span></span><span>95</span><span class="tip" id="tip-sec" role="tooltip">Paranoid, but with logs.</span></div>
+    <div class="stat" tabindex="0" aria-describedby="tip-ml"><span>Machine learning</span><span class="track"><span class="bar" data-value="90" style="--v:90%"></span></span><span>90</span><span class="tip" id="tip-ml" role="tooltip">Pre-registered test sets, because dev scores flatter.</span></div>
+    <div class="stat" tabindex="0" aria-describedby="tip-cv"><span>Computer vision</span><span class="track"><span class="bar" data-value="85" style="--v:85%"></span></span><span>85</span><span class="tip" id="tip-cv" role="tooltip">Macro-F1 0.92 on WM-811K wafer maps.</span></div>
+    <div class="stat" tabindex="0" aria-describedby="tip-llm"><span>LLM systems</span><span class="track"><span class="bar" data-value="85" style="--v:85%"></span></span><span>85</span><span class="tip" id="tip-llm" role="tooltip">Grounded answers, or no answer.</span></div>
+    <div class="stat" tabindex="0" aria-describedby="tip-infra"><span>Infrastructure</span><span class="track"><span class="bar" data-value="95" style="--v:95%"></span></span><span>95</span><span class="tip" id="tip-infra" role="tooltip">Backups verified, not assumed.</span></div>
+    <div class="stat" tabindex="0" aria-describedby="tip-sec"><span>Security</span><span class="track"><span class="bar" data-value="90" style="--v:90%"></span></span><span>90</span><span class="tip" id="tip-sec" role="tooltip">Layered, monitored, reviewed after every change.</span></div>
     <div class="stat" tabindex="0" aria-describedby="tip-theater"><span>Home theater</span><span class="track"><span class="bar" data-value="80" style="--v:80%"></span></span><span>80</span><span class="tip" id="tip-theater" role="tooltip">Subwoofer registers on seismographs.</span></div>
-    <div class="stat" tabindex="0" aria-describedby="tip-sleep"><span>Sleep</span><span class="track"><span class="bar" data-value="35" style="--v:35%"></span></span><span>35</span><span class="tip" id="tip-sleep" role="tooltip">Generously rounded.</span></div>
   </section>
 
   <section class="panel" aria-labelledby="quests-h">
     <h2 id="quests-h">Quest log</h2>
+    <h3 class="sub-h">Public on GitHub</h3>
     <ul class="clean quests">
       <li class="quest"><a href="https://github.com/Alex8642/LLM-chatbot">LLM-chatbot</a>
         <p>Q&amp;A over technical manuals where every claim carries a verbatim, highlighted quote from its source page.</p></li>
@@ -195,40 +198,71 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
         <p>Dual-mic meeting recordings to clean transcripts and LLM-written audit reports, fully local.</p></li>
       <li class="quest"><a href="https://github.com/Alex8642/itb-site">itb-site</a>
         <p>Industrial Technology Bridge: a static one-page site, nginx in Docker, auto-built to GHCR.</p></li>
-      <li class="quest"><a href="https://github.com/Alex8642/UNRAID_Scripts">UNRAID_Scripts</a>
-        <p>Scripts for the media server.</p></li>
+      <li class="quest"><a href="https://github.com/Alex8642/wafer-ssl">wafer-ssl</a>
+        <p>SimCLR self-supervised pretraining on 638k unlabeled WM-811K wafer maps, with multi-seed ensembling.</p></li>
+    </ul>
+    <h3 class="sub-h">Shipped, not on GitHub</h3>
+    <p class="sub">Real systems I have built and run, described by what and why. The stack stays private.</p>
+    <ul class="clean quests shipped">
+      <li class="quest"><span class="cat">AI &amp; ML systems</span><strong>Patch-controlled GPU cluster</strong>
+        <p>Brought two months-behind nodes current (501 packages, new kernel and signed driver) without breaking multi-node serving. Traced a kernel 7.x regression in RDMA memory registration, pinned it out, and put a smoke-test suite in front of every change.</p></li>
+      <li class="quest"><span class="cat">AI &amp; ML systems</span><strong>Open-weight model evaluations</strong>
+        <p>Structured evaluations of new open-weight models on the cluster, written up in a running comparison table. Findings stay on experiment branches, so production is never touched.</p></li>
+      <li class="quest"><span class="cat">Security</span><strong>Layered network perimeter</strong>
+        <p>Defence in depth at the edge: IP-reputation blocklists, geo-fenced exposure, inline IPS and a SIEM. Rolled out in stages with dry-run review; the first enforcement review showed 21 blocks in 3 days, all scanners, no false positives.</p></li>
+      <li class="quest"><span class="cat">Security</span><strong>Fleet-wide SIEM coverage</strong>
+        <p>Agents across the hypervisor, servers, DNS, identity and edge devices, plus syslog collection for appliances that cannot run an agent.</p></li>
+      <li class="quest"><span class="cat">Security</span><strong>Secrets hygiene</strong>
+        <p>Full-history secret scan of all 47 repositories (public, private and forks). Every hit triaged; no live credential in any public repo.</p></li>
+      <li class="quest"><span class="cat">Security</span><strong>Least-privilege automation</strong>
+        <p>The operations agent runs on SSH keys pinned to a single source host, dry-runs before applying, snapshots before changing, and needs explicit approval for anything destructive.</p></li>
+      <li class="quest"><span class="cat">Security</span><strong>Voice-assistant blast radius</strong>
+        <p>Reviewed what a home voice assistant could actuate (appliances, a water valve, the garage), documented the risk and trimmed what it can reach.</p></li>
+      <li class="quest"><span class="cat">Reliability</span><strong>Tiered backups with proof</strong>
+        <p>Weekly guest backups with scheduled verification, a nightly off-box copy kept as 14 daily snapshots through a read-only, forced-command key, and a yearly cold copy. A staleness alert fires if the nightly job goes quiet for 25 hours.</p></li>
+      <li class="quest"><span class="cat">Reliability</span><strong>Outage forensics</strong>
+        <p>Diagnosed a 4-hour WAN outage from the modem's own logs (a virtualised router never saw the link flap), then designed and dry-run-tested a conditional recovery watchdog.</p></li>
+      <li class="quest"><span class="cat">Reliability</span><strong>Resilient DNS</strong>
+        <p>Encrypted upstream resolution with automatic fallback, failover tested with the primary resolver deliberately down, and split-horizon answers fixed after rebind protection was dropping them.</p></li>
+      <li class="quest"><span class="cat">Reliability</span><strong>Alerts that work during an outage</strong>
+        <p>Uptime monitoring with a second, LAN-local notification path to a phone, so an internet outage is announced during the outage, not after.</p></li>
+      <li class="quest"><span class="cat">Reliability</span><strong>Weekly fleet health report</strong>
+        <p>A read-only health script plus an agent that summarises it, commits the report and notifies me. Guards flag version drift and hung updates.</p></li>
+      <li class="quest"><span class="cat">Reliability</span><strong>Trust, but verify the dashboard</strong>
+        <p>Found a third-party hypervisor dashboard charting simulated sensor data. Replaced it with real readings, reported it upstream, and removed the package and its 249 dependencies.</p></li>
+      <li class="quest"><span class="cat">Reliability</span><strong>Appliance self-healing</strong>
+        <p>Root-caused a Linux media box failing after suspend (wedged Bluetooth, stuck HDMI mode), shipped watchdogs that repair both, then disabled suspend at the source.</p></li>
+      <li class="quest"><span class="cat">Home automation</span><strong>Ventilation learner</strong>
+        <p>A home-automation integration that learns whether opening a window is worth it, weighing air quality against energy cost.</p></li>
     </ul>
   </section>
 
   <section class="panel" aria-labelledby="load-h">
     <h2 id="load-h">Loadout</h2>
-    <p class="sub">A worrying number of AI-ready computers.</p>
+    <p class="sub">What it all runs on.</p>
     <ul class="clean chips">
-      <li class="chip">2× NVIDIA DGX Spark <small>(tensor-parallel over a direct RoCE link, because one wasn't enough)</small></li>
-      <li class="chip">RTX 5090 <small>(for "gaming")</small></li>
-      <li class="chip">Enough VRAM to pay the mortgage <small>(256 GB unified, still tuning the KV cache)</small></li>
-      <li class="chip">Once built a 40GbE hyperconverged Ceph cluster from two laptops and USB4 <small>(BECAUSE)</small></li>
-      <li class="chip">~200 TB of home storage <small>(backups verified, because I'm not a monster)</small></li>
-      <li class="chip">A firewall VM with 16 GB of RAM <small>(the IPS is hungry)</small></li>
-      <li class="chip">A Raspberry Pi 5 that tunes my subwoofer</li>
-      <li class="chip">Local LLM gateway <small>(SSO + a silent-fault watchdog)</small></li>
-      <li class="chip">Kernel and driver pinned on purpose <small>(<code>apt upgrade</code> is a dare)</small></li>
+      <li class="chip">2× NVIDIA DGX Spark <small>(tensor-parallel serving over a direct RoCE link)</small></li>
+      <li class="chip">RTX 5090 <small>(model and retrieval experiments)</small></li>
+      <li class="chip">Enough VRAM to pay the mortgage <small>(256 GB unified across the cluster)</small></li>
+      <li class="chip">Built a 40GbE hyperconverged Ceph cluster from two laptops and USB4 <small>(because)</small></li>
+      <li class="chip">~200 TB of home storage <small>(backups verified)</small></li>
+      <li class="chip">A firewall VM running an inline IPS</li>
+      <li class="chip">A Raspberry Pi 5 driving home-theater DSP</li>
+      <li class="chip">Local LLM gateway <small>(SSO and a silent-fault watchdog)</small></li>
+      <li class="chip">Kernel and driver pinned deliberately <small>(changes gated by a smoke-test suite)</small></li>
     </ul>
   </section>
 
   <section class="panel status" aria-labelledby="status-h">
-    <h2 id="status-h">Server status</h2>
-    <p class="status-line"><span class="dot" aria-hidden="true"></span><strong>Homelab: probably fine</strong>
-      <small>(this page lives on GitHub, so it can't tell you either way)</small></p>
-    <p>Think it's down? <a href="https://status.itb.guru/status/homelab" rel="noopener" target="_blank">Check the status page</a>
-      that runs inside the very homelab it's reporting on. What could go wrong?</p>
+    <h2 id="status-h">Status</h2>
+    <p>Live status of my self-hosted services: <a href="https://status.itb.guru/status/homelab" rel="noopener" target="_blank">status page</a>.</p>
   </section>
 
   <section class="panel" aria-labelledby="side-h">
-    <h2 id="side-h">Side quests</h2>
+    <h2 id="side-h">Currently</h2>
     <ul class="clean facts">
-      <li>Tunes a home theater with miniDSP and bass-EQ filters until the neighbours file a complaint.</li>
-      <li>Shields it all with a home-built firewall, IDS/IPS, SIEM and threat-intel feed. It isn't paranoia when the logs prove they really are scanning you.</li>
+      <li>Rebuilding LLM-chatbot around grounded answers: every claim carries a verbatim quote, checked against its source page.</li>
+      <li>Evaluating open-weight models on a two-node GB10 cluster, with every change gated by a smoke test.</li>
       <li>Believes every claim should come with a source, and every model with an error bar.</li>
     </ul>
   </section>
@@ -490,7 +524,7 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
   }
 
   // hidden terminal: ` or typing "sudo" (or the footer button) opens it; Esc closes it
-  const QUESTS = ["LLM-chatbot", "onprem-llm-stack", "wafer-defect-classifier", "wafer-deploy", "wafer-rootcause", "audio2report", "itb-site", "UNRAID_Scripts"];
+  const QUESTS = ["LLM-chatbot", "onprem-llm-stack", "wafer-defect-classifier", "wafer-deploy", "wafer-rootcause", "audio2report", "itb-site", "wafer-ssl"];
   const hist = []; let hpos = 0, termOpener = null;
   function print(text) { const d = document.createElement("div"); d.textContent = text; termOut.appendChild(d); termOut.scrollTop = termOut.scrollHeight; }
   function openTerm() {
