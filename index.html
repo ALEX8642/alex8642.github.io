@@ -557,7 +557,7 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
       : /^(about|readme)/i.test(a[0]) ? "Builds things that actually work, then builds a homelab to run them on."
       : "cat: " + a[0] + ": No such file or directory",
     theme: (a) => THEMES.includes(a[0]) ? (setTheme(a[0], true), "theme: " + a[0]) : "usage: theme <neon|matrix|synthwave>",
-    cameo: () => calm ? "The cameos are resting (reduced motion is on)." : cameo() ? "Look out the window…" : "One at a time, please.",
+    cameo: () => calm ? "The cameos are resting (reduced motion is on)." : cameo(undefined, true) ? "Look out the window…" : "Cameos only run while this tab is visible.",
     achievements: () => ACH.map(([id, name]) => (store.get("ach").includes(id) ? "[x] " : "[ ] ") + name).join("\n"),
     trail: (a) => !trailCv ? "trail: unavailable (reduced motion)" : a[0] === "off" ? (setTrail(false), "trail: off") : a[0] === "on" ? (setTrail(true), "trail: on") : "usage: trail <on|off>",
     ping: () => "64 bytes from homelab: it's fine. Probably.",
@@ -699,20 +699,26 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
     ];
   };
 
-  function cameo(name) {
-    if (calm || document.hidden || cameoBusy) return false;
+  let endCurrentCameo = null;
+  // user = true when a person asked (button / terminal): that skips the running cameo; the timer never does
+  function cameo(name, user) {
+    if (calm || document.hidden) return false;
+    if (cameoBusy) { if (!user || !endCurrentCameo) return false; endCurrentCameo(); }
     const keys = Object.keys(CAMEOS);
     const known = (n) => keys.includes(n);   // own keys only: never constructor/__proto__/toString
     const pool = keys.filter((k) => !recentCameos.includes(k));   // nothing from the last 3 shown
+    const unseen = pool.filter((k) => !store.get("seen").includes(k));   // new ones first: 11 summons show all 11
+    const choices = unseen.length ? unseen : (pool.length ? pool : keys);
     if (!known(name)) name = forcedCameo;
-    name = known(name) ? name : (pool.length ? pool : keys)[Math.floor(Math.random() * (pool.length || keys.length))];
+    name = known(name) ? name : choices[Math.floor(Math.random() * choices.length)];
     markSeen(name);
     cameoBusy = true; recentCameos.push(name); if (recentCameos.length > 3) recentCameos.shift();
     const layer = document.createElement("div");
     layer.className = "cameo"; layer.dataset.cameo = name; layer.setAttribute("aria-hidden", "true");
     document.body.appendChild(layer);
     let ended = false, timer = 0;
-    const done = () => { if (ended) return; ended = true; clearTimeout(timer); layer.remove(); cameoBusy = false; };
+    const done = () => { if (ended) return; ended = true; clearTimeout(timer); layer.remove(); cameoBusy = false; if (endCurrentCameo === done) endCurrentCameo = null; };
+    endCurrentCameo = done;
     timer = setTimeout(done, 15000);
     try {
       const anims = CAMEOS[name](layer);
@@ -727,7 +733,7 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
   }
 
   const summon = $("#summon");
-  if (!calm) { summon.hidden = false; summon.addEventListener("click", () => cameo()); scheduleCameos(); }
+  if (!calm) { summon.hidden = false; summon.addEventListener("click", () => cameo(undefined, true)); scheduleCameos(); }
 
   starfield($("#bg"));
   initExtras();
