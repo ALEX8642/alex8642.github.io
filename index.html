@@ -109,6 +109,7 @@ body.term-open #toast { bottom: auto; top: 12px; }
 .actor { position: absolute; left: 0; top: 0; will-change: transform; }
 .actor svg { display: block; width: 56px; height: 56px; fill: none; stroke: var(--cyan); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 4px var(--cyan)); }
 .actor.big svg { width: 84px; height: 84px; }
+.actor .boot { fill: rgba(255, 209, 102, .25); }
 .actor.small svg { width: 40px; height: 40px; }
 .actor .axe-blade { fill: rgba(255,107,107,.3); }
 .actor .axe-gem { stroke: var(--gold); fill: var(--gold); }
@@ -614,7 +615,8 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
     spot: V('<ellipse cx="28" cy="40" rx="16" ry="9"/><circle cx="49" cy="33" r="7"/><path d="M44 28l-1-8 6 4M52 27l3-7 1 9M12 38q-10-10-3-21M20 48v9M26 49v9M36 49v9M42 48v9"/>'),
     kratos: V('<circle cx="24" cy="10" r="7"/><path d="M18 14q6 12 12 0"/><path d="M12 22h24l-4 20H16zM12 24l-8 12M36 24l8 8M19 42l-5 16M29 42l5 16"/><g class="axe"><path class="axe-handle" d="M44 58V12"/><path class="axe-collar" d="M40 10h8v14h-8z"/><circle class="axe-gem" cx="44" cy="15" r="1.8"/><path class="axe-butt" d="M40 11h-7v9h7"/><path class="axe-blade" d="M48 10L61 12Q64 26 58 38L54 33Q56 25 48 24"/></g>'),
     boy: V('<circle cx="26" cy="14" r="5"/><path d="M26 19l-1 17M25 24l-6 6M25 24l19 4M25 36l-7 14M25 36l10 10"/><path class="bow" d="M44 12q14 16 0 32M44 12v32"/><path class="arrow" d="M30 28h27M57 28l-4-3M57 28l-4 3M31 28l-3-3M31 28l-3 3"/>'),
-    walle: V('<path d="M14 26h28v18H14z"/><path d="M10 44h36v9H10z"/><circle cx="17" cy="48.5" r="2"/><circle cx="39" cy="48.5" r="2"/><path d="M28 26v-6M18 14h20"/><circle cx="21" cy="14" r="4.5"/><circle cx="35" cy="14" r="4.5"/><path d="M42 32l11 5M53 37v-7M53 30q5-1 6-6M53 33q-5-1-6-5"/>'),
+    walle: V('<path d="M14 26h28v18H14z"/><path d="M10 44h36v9H10z"/><circle cx="17" cy="48.5" r="2"/><circle cx="39" cy="48.5" r="2"/><path d="M28 26v-6M18 14h20"/><circle cx="21" cy="14" r="4.5"/><circle cx="35" cy="14" r="4.5"/><path d="M42 32l9 3"/><path class="boot" d="M50 38v-9h7v11h5v4H50z"/><path class="sprout" d="M53.5 29q-1-6 3-8M53.5 29q-1-4-5-5"/>'),
+    eve: V('<g class="eve"><path d="M32 6C20 6 14 17 14 30s6 24 18 24 18-11 18-24S44 6 32 6z"/><path d="M22 24c0-4 4-6 10-6s10 2 10 6-4 6-10 6-10-2-10-6z"/><path d="M26 23h4M34 23h4"/><path d="M14 34l-7 6M50 34l7 6M32 54v4"/></g>'),
     cube: V('<rect x="12" y="12" width="40" height="40" rx="3"/><rect x="19" y="19" width="26" height="26" rx="2"/><path d="M32 41l-7-7a4.5 4.5 0 0 1 7-5a4.5 4.5 0 0 1 7 5z"/><circle cx="15" cy="15" r="1.5"/><circle cx="49" cy="15" r="1.5"/><circle cx="15" cy="49" r="1.5"/><circle cx="49" cy="49" r="1.5"/>'),
     gordon: V('<circle cx="24" cy="11" r="6"/><path d="M19 10h10M22 16q2 3 4 0"/><path d="M16 20h16v18H16zM24 24v10"/><path d="M32 24l9-4M41 20l12-14M53 6q4-3 7 1M16 24l-8 9M20 38l-4 16M28 38l4 16"/>'),
     maelle: V('<circle cx="26" cy="12" r="5.5"/><path d="M20 11q6-9 12 0M32 11q4 3 2 9"/><path d="M26 18l-9 22h18z"/><path d="M30 24l9 3M39 27L57 8M35 31l7-8"/><path d="M23 40l-3 14M29 40l3 14"/>'),
@@ -671,7 +673,10 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
     ...cross(layer, { svg: SVG.boy, y: y + 18, ms: 8000, bob: 5 }),
     ...cross(layer, { svg: SVG.kratos, text: "BOYYYYYY!", cls: "big red", y, ms: 8000, delay: 900, bob: 6 })]; };
 
-  CAMEOS.walle = (layer) => cross(layer, { svg: SVG.walle, text: "EVE-ah?", cls: "big gold", y: innerHeight - 140, dy: 0, ms: 9000, bob: 2 });
+  // EVE floats ahead; WALL-E rolls after her, holding out the boot with the seedling
+  CAMEOS.walle = (layer) => { const y = innerHeight - 140; return [
+    ...cross(layer, { svg: SVG.eve, cls: "big", y: y - 40, dy: 0, ms: 7500, bob: 6 }),
+    ...cross(layer, { svg: SVG.walle, text: "EVE-ah?", cls: "big gold", y, dy: 0, ms: 8500, delay: 900, bob: 2 })]; };
   CAMEOS.gordon = (layer) => cross(layer, { svg: SVG.gordon, text: "Half-Life 3 confirmed.", cls: "big gold", y: lane(innerHeight), ms: 8000, bob: 4 });
   CAMEOS.maelle = (layer) => cross(layer, { svg: SVG.maelle, text: "For those who come after.", cls: "big pink", y: lane(innerHeight), ms: 8500, bob: 3 });
   CAMEOS.tlou = (layer) => { const y = lane(innerHeight); return [
