@@ -1,137 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <title>Nothing to see here...</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #121212;
-            color: #e0e0e0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 2em;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ALEX8642 — Character Sheet</title>
+<meta name="description" content="Industrial AI, wafer-defect ML, on-prem LLMs and a homelab that got out of hand.">
+<!-- PLACEHOLDER: class title, tagline, fun facts and loadout are drafts — confirm with Alex -->
+<style>
+:root {
+  --bg: #0a0d16; --panel: #121827; --ink: #e6ebf5; --dim: #93a0bd;
+  --cyan: #4de1ff; --pink: #ff4ecd; --gold: #ffd166;
+  --shine: 50% 0%;
+}
+* { box-sizing: border-box; }
+html { color-scheme: dark; }
+body {
+  margin: 0; min-height: 100vh; background: var(--bg); color: var(--ink);
+  font: 16px/1.55 ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  overflow-x: hidden;
+}
+#bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; display: block; }
+main { position: relative; z-index: 1; max-width: 880px; margin: 0 auto; padding: 32px 16px 64px; }
+a { color: var(--cyan); text-underline-offset: 3px; }
+a:hover { color: var(--pink); }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 4px; }
 
-        .quote-box {
-            background-color: #1e1e1e;
-            border-left: 4px solid #00bcd4;
-            padding: 1.5em;
-            margin: 1em 0;
-            max-width: 600px;
-            width: 100%;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-        }
+.panel {
+  background: color-mix(in srgb, var(--panel) 88%, transparent);
+  border: 1px solid #26314d; border-radius: 14px; padding: 20px 22px; margin: 0 0 20px;
+}
+h2 { margin: 0 0 12px; font-size: 14px; letter-spacing: .18em; text-transform: uppercase; color: var(--pink); }
+h2::before { content: "▸ "; color: var(--cyan); }
 
-        .fun-box {
-            background-color: #252525;
-            border-left: 4px dashed #ff9800;
-            color: #ffc107;
-        }
+/* header card */
+#card {
+  position: relative; padding: 28px 24px; border-radius: 18px; margin-bottom: 20px;
+  border: 1px solid #2c3a5e; transform-style: preserve-3d; will-change: transform;
+  background:
+    radial-gradient(circle at var(--shine), rgba(77,225,255,.18), transparent 55%),
+    linear-gradient(145deg, #141b30, #0e1322);
+  box-shadow: 0 0 0 1px rgba(255,78,205,.15), 0 12px 40px rgba(0,0,0,.45);
+}
+.card-top { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
+#title { margin: 0; font-size: clamp(30px, 8vw, 54px); line-height: 1.05; letter-spacing: .04em; color: var(--ink); overflow-wrap: anywhere; }
+.class { margin: 6px 0 0; color: var(--gold); letter-spacing: .12em; text-transform: uppercase; font-size: 14px; }
+.tagline { margin: 14px 0 0; color: var(--dim); max-width: 52ch; }
+#level {
+  font: inherit; font-weight: 700; cursor: pointer; color: #0a0d16;
+  background: linear-gradient(135deg, var(--gold), #ff9f43); border: 0; border-radius: 999px;
+  padding: 8px 16px; letter-spacing: .1em; position: relative;
+}
+#level:hover { filter: brightness(1.1); }
 
-        .quote {
-            font-size: 1.2em;
-            line-height: 1.5;
-        }
+/* stats */
+.stat { display: grid; grid-template-columns: 9.5em 1fr 3em; gap: 12px; align-items: center; margin: 10px 0; }
+.stat > span:first-child { color: var(--dim); }
+.stat > span:last-child { text-align: right; color: var(--cyan); }
+.track { display: block; height: 12px; border-radius: 99px; background: #0b1020; border: 1px solid #26314d; overflow: hidden; }
+.bar { display: block; height: 100%; width: var(--v); border-radius: 99px; background: linear-gradient(90deg, var(--cyan), var(--pink)); box-shadow: 0 0 10px rgba(77,225,255,.6); }
 
-        .author {
-            text-align: right;
-            margin-top: 1em;
-            font-style: italic;
-            font-size: 0.95em;
-            color: #aaa;
-        }
+/* quests */
+ul.clean { list-style: none; margin: 0; padding: 0; }
+.quests { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.quest { background: #0e1424; border: 1px solid #26314d; border-radius: 10px; padding: 12px 14px; min-width: 0; transition: border-color .2s, transform .2s; }
+.quest:hover { border-color: var(--pink); transform: translateY(-2px); }
+.quest a { font-weight: 700; overflow-wrap: anywhere; }
+.quest p { margin: 4px 0 0; color: var(--dim); font-size: 14px; }
 
-        h1 {
-            margin-bottom: 0.2em;
-        }
+/* loadout + facts */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1px solid #34456f; background: #0e1424; border-radius: 8px; padding: 4px 10px; font-size: 14px; }
+.facts li { margin: 8px 0; padding-left: 1.4em; position: relative; }
+.facts li::before { content: "✦"; position: absolute; left: 0; color: var(--gold); }
+footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28px; }
+.hint { opacity: .7; font-size: 12px; margin-top: 6px; }
 
-        p {
-            margin-top: 0;
-            margin-bottom: 1em;
-            color: #999;
-        }
-
-        #funfact {
-            white-space: pre-wrap;
-        }
-    </style>
+@media (max-width: 520px) {
+  .stat { grid-template-columns: 1fr 3em; }
+  .stat .track { grid-column: 1 / -1; grid-row: 2; }
+  .panel { padding: 16px; }
+}
+</style>
 </head>
-
 <body>
-
-    <h1>🛰️💥🕳️ No Forwarding Address Found 🕳️💥🛰️</h1>
-    <p>But here's a random dev quote to brighten your day:</p>
-
-    <div class="quote-box">
-        <div id="quote" class="quote">Loading quote...</div>
-        <div id="author" class="author">Loading author...</div>
+<canvas id="bg" aria-hidden="true"></canvas>
+<main>
+  <header id="card">
+    <div class="card-top">
+      <div>
+        <h1 id="title">ALEX8642</h1>
+        <p class="class">Class: Industrial AI Engineer</p>
+      </div>
+      <button id="level" type="button" aria-label="Level 8642. Click for a surprise.">LVL 8642</button>
     </div>
+    <p class="tagline">I turn messy factory data and very large GPUs into things that actually work — then build a homelab to run them on.</p>
+  </header>
 
-    <p>And here's something else you probably didn't need to know:</p>
-    <div class="quote-box fun-box">
-        <div id="funfact" class="quote">Loading fun fact...</div>
-    </div>
+  <section class="panel" aria-labelledby="stats-h">
+    <h2 id="stats-h">Stats</h2>
+    <div class="stat"><span>Machine learning</span><span class="track"><span class="bar" data-value="90" style="--v:90%"></span></span><span>90</span></div>
+    <div class="stat"><span>Wafer defects</span><span class="track"><span class="bar" data-value="85" style="--v:85%"></span></span><span>85</span></div>
+    <div class="stat"><span>Homelab</span><span class="track"><span class="bar" data-value="100" style="--v:100%"></span></span><span>100</span></div>
+    <div class="stat"><span>Home theater</span><span class="track"><span class="bar" data-value="80" style="--v:80%"></span></span><span>80</span></div>
+    <div class="stat"><span>Sleep</span><span class="track"><span class="bar" data-value="35" style="--v:35%"></span></span><span>35</span></div>
+  </section>
 
-    <script>
-        const quotes = [
-            { text: "Weeks of coding can save you hours of planning.", author: "Anonymous" },
-            { text: "To understand recursion, one must first understand recursion.", author: "Unknown" },
-            { text: "It's not a bug — it's an undocumented feature.", author: "Every developer ever" },
-            { text: "There are two hard things in computer science: cache invalidation, naming things, and off-by-one errors.", author: "Phil Karlton (probably)" },
-            { text: "Why do programmers always mix up Halloween and Christmas? Because Oct 31 == Dec 25.", author: "Anonymous" }
-        ];
+  <section class="panel" aria-labelledby="quests-h">
+    <h2 id="quests-h">Quest log</h2>
+    <ul class="clean quests">
+      <li class="quest"><a href="https://github.com/Alex8642/LLM-chatbot">LLM-chatbot</a>
+        <p>Q&amp;A over technical manuals where every claim carries a verbatim, highlighted quote from its source page.</p></li>
+      <li class="quest"><a href="https://github.com/Alex8642/onprem-llm-stack">onprem-llm-stack</a>
+        <p>Two-node NVIDIA GB10 LLM platform: tensor-parallel serving, SSO, evaluation, and a silent-fault watchdog.</p></li>
+      <li class="quest"><a href="https://github.com/Alex8642/wafer-defect-classifier">wafer-defect-classifier</a>
+        <p>ResNet-18 on WM-811K with focal loss, attention, calibration and Grad-CAM++. Macro-F1 0.92.</p></li>
+      <li class="quest"><a href="https://github.com/Alex8642/wafer-deploy">wafer-deploy</a>
+        <p>FastAPI serving with drift monitoring (MMD, PSI, ECE), a retrain trigger, Prometheus and Grafana.</p></li>
+      <li class="quest"><a href="https://github.com/Alex8642/wafer-rootcause">wafer-rootcause</a>
+        <p>SQL root-cause pipeline: spatial defect signatures traced back to the tool and chamber.</p></li>
+      <li class="quest"><a href="https://github.com/Alex8642/audio2report">audio2report</a>
+        <p>Dual-mic meeting recordings to clean transcripts and LLM-written audit reports, fully local.</p></li>
+      <li class="quest"><a href="https://github.com/Alex8642/itb-site">itb-site</a>
+        <p>Industrial Technology Bridge: a static one-page site, nginx in Docker, auto-built to GHCR.</p></li>
+      <li class="quest"><a href="https://github.com/Alex8642/UNRAID_Scripts">UNRAID_Scripts</a>
+        <p>Scripts for the media server.</p></li>
+    </ul>
+  </section>
 
-        const funFacts = [
-            // Funny facts, Trump jabs, absurd trivia
-            "Donald Trump claimed 'windmills cause cancer'. Meanwhile, fossil fuels just cause the planet to melt.",
-            "Stack Overflow was down for 20 minutes once. 10,000 devs remembered they had families.",
-            "If a tree falls in the forest and no one is around, does it still break the CI pipeline?",
-            "A programmer's diet: 90% coffee, 10% existential dread.",
-            "Trump once said he 'knows words, he has the best words.' Then spelled 'coffee' as 'covfefe'.",
-            "Your VPN is more secure than your government.",
-            "JavaScript can’t tell the difference between 0 and false. Neither can Congress.",
-            "AI will replace all jobs — except politicians. They are still immune to intelligence.",
-            "There are more lines of code in a modern car than in Windows 95 — and about the same number of crashes.",
-            "A camel can survive 2 weeks without water. Your code survives 2 years without a comment.",
+  <section class="panel" aria-labelledby="load-h">
+    <h2 id="load-h">Loadout</h2>
+    <ul class="clean chips">
+      <li class="chip">2× NVIDIA DGX Spark</li>
+      <li class="chip">RTX 5090 rig</li>
+      <li class="chip">Proxmox</li>
+      <li class="chip">Unraid</li>
+      <li class="chip">Home Assistant</li>
+      <li class="chip">PyTorch</li>
+      <li class="chip">Docker</li>
+      <li class="chip">Python + SQL</li>
+    </ul>
+  </section>
 
-            // Poems
-            `Roses are #FF0000,\nViolets are #0000FF,\nYour code compiled on first try?\nWhat black magic did you do?`,
-            `The server is down,\nAgain with no warning,\nThe logs say it's fine,\nBut I'm mourning.`,
-            `My code runs fast,\nMy tests all pass,\nIt’s Friday night —\nDeploy to prod? ...I'll pass.`,
-            `Tabs or spaces,\nA war with no end,\nBut both will break,\nIf alignment's your friend.`,
+  <section class="panel" aria-labelledby="side-h">
+    <h2 id="side-h">Side quests</h2>
+    <ul class="clean facts">
+      <li>Tunes a home theater with miniDSP and bass-EQ filters until the neighbours file a complaint.</li>
+      <li>Treats a "small" home network as a hobby with its own threat model.</li>
+      <li>Believes every claim should come with a source, and every model with an error bar.</li>
+    </ul>
+  </section>
 
-            // Weird but true
-            "Sharks are older than trees. Much like your legacy COBOL system.",
-            "The moon is slowly moving away from Earth. So is your Wi-Fi router, emotionally.",
-            "You blink ~20 times per minute. That's 20 missed bugs per code review.",
-            "The word 'algorithm' comes from a Persian mathematician. The bugs, however, are all yours.",
-            "Hot water can freeze faster than cold. Just like hot takes on Twitter."
-        ];
-
-        function shuffle(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(
-                    crypto.getRandomValues(new Uint32Array(1))[0] / (2 ** 32) * (i + 1)
-                );
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
-        const shuffledQuotes = shuffle([...quotes]);
-        const shuffledFacts = shuffle([...funFacts]);
-
-        const random = shuffledQuotes[0];
-        const randomFact = shuffledFacts[0];
-
-        document.getElementById('quote').textContent = `"${random.text}"`;
-        document.getElementById('author').textContent = `– ${random.author}`;
-        document.getElementById('funfact').textContent = randomFact;
-    </script>
+  <footer>
+    <a href="https://github.com/Alex8642">github.com/Alex8642</a>
+    <div class="hint">psst — the level badge is clickable. Old-school codes also work.</div>
+  </footer>
+</main>
+</body>
+</html>
