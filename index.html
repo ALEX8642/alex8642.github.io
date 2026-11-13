@@ -73,6 +73,17 @@ ul.clean { list-style: none; margin: 0; padding: 0; }
 @media (prefers-reduced-motion: no-preference) { .dot { animation: ping 2s ease-in-out infinite; } }
 @keyframes ping { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
 
+/* cameos */
+.linkish { font: inherit; font-size: 12px; background: none; border: 0; padding: 2px 4px; color: var(--cyan); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.linkish:hover { color: var(--pink); }
+.cameo { position: fixed; inset: 0; z-index: 4; pointer-events: none; overflow: hidden; }
+.actor { position: absolute; left: 0; top: 0; will-change: transform; }
+.actor svg { display: block; width: 56px; height: 56px; fill: none; stroke: var(--cyan); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 4px var(--cyan)); }
+.actor.big svg { width: 84px; height: 84px; }
+.actor.pink svg { stroke: var(--pink); filter: drop-shadow(0 0 4px var(--pink)); }
+.actor.gold svg { stroke: var(--gold); filter: drop-shadow(0 0 4px var(--gold)); }
+.bubble { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); white-space: nowrap; background: #0e1424; color: #e6ebf5; border: 1px solid var(--pink); border-radius: 10px; padding: 3px 9px; font-size: 13px; }
+
 /* loadout + facts */
 .sub { margin: 0 0 12px; color: var(--dim); }
 .chip code { color: var(--cyan); font-size: 12px; }
@@ -194,7 +205,8 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
 
   <footer>
     <a href="https://github.com/Alex8642">github.com/Alex8642</a>
-    <div class="hint">psst — the level badge is clickable. Old-school codes also work.</div>
+    <div class="hint">psst — the level badge is clickable. Old-school codes also work.
+      <button id="summon" class="linkish" type="button" hidden>Or click here for a surprise.</button></div>
   </footer>
 </main>
 <script>
@@ -335,6 +347,54 @@ footer { text-align: center; color: var(--dim); font-size: 14px; margin-top: 28p
     pos = k === code[pos] ? pos + 1 : (k === code[0] ? (pos === 2 ? 2 : 1) : 0);
     if (pos === code.length) { pos = 0; say("+30 LIVES"); confetti(); }
   });
+
+  // ---- cameos: rare sci-fi drive-bys (decorative; none under reduced motion) ----
+  const SVG = {
+    astronaut: '<svg viewBox="0 0 64 64"><circle cx="32" cy="18" r="11"/><ellipse cx="32" cy="18" rx="7" ry="5"/><rect x="22" y="30" width="20" height="20" rx="6"/><path d="M22 34l-9 8M42 34l9 8M27 50l-4 11M37 50l4 11"/><path d="M42 36q14 6 12 22" stroke-dasharray="2 3"/></svg>',
+  };
+  const CAMEOS = {};
+  let lastCameo = "", cameoBusy = false;
+
+  const lane = (vh) => vh * (Math.random() < 0.5 ? 0.08 + Math.random() * 0.12 : 0.72 + Math.random() * 0.15);
+  const dash = (el, from, to, ms, delay = 0) =>
+    el.animate([{ transform: from }, { transform: to }], { duration: ms, delay, easing: "linear", fill: "both" });
+
+  function actor(layer, markup, text, cls = "") {
+    const el = document.createElement("div");
+    el.className = ("actor " + cls).trim();
+    el.innerHTML = markup;
+    if (text) { const b = document.createElement("div"); b.className = "bubble"; b.textContent = text; el.appendChild(b); }
+    layer.appendChild(el);
+    return { el, svg: el.querySelector("svg") };
+  }
+
+  CAMEOS.astronaut = (layer) => {
+    const vw = innerWidth, y = lane(innerHeight);
+    const a = actor(layer, SVG.astronaut, "Murph?!", "gold");
+    return [
+      dash(a.el, `translate(-90px, ${y}px)`, `translate(${vw + 90}px, ${y - 50}px)`, 9000),
+      a.svg.animate([{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], { duration: 9000, easing: "linear", fill: "both" }),
+    ];
+  };
+
+  function cameo(name) {
+    if (calm || document.hidden || cameoBusy) return false;
+    const keys = Object.keys(CAMEOS);
+    const pool = keys.filter((k) => k !== lastCameo);
+    name = CAMEOS[name] ? name : (pool.length ? pool : keys)[Math.floor(Math.random() * (pool.length || keys.length))];
+    cameoBusy = true; lastCameo = name;
+    const layer = document.createElement("div");
+    layer.className = "cameo"; layer.dataset.cameo = name; layer.setAttribute("aria-hidden", "true");
+    document.body.appendChild(layer);
+    const done = () => { layer.remove(); cameoBusy = false; };
+    const anims = CAMEOS[name](layer);
+    Promise.allSettled(anims.map((a) => a.finished)).then(done);
+    setTimeout(done, 15000);
+    return true;
+  }
+
+  const summon = $("#summon");
+  if (!calm) { summon.hidden = false; summon.addEventListener("click", () => cameo()); }
 
   starfield($("#bg"));
   if (!calm) {
